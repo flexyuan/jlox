@@ -6,8 +6,11 @@ import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 
-public class Main {
+public class Lox {
+
+    private static boolean hadError = false;
 
     public static void main(String[] args) throws IOException {
         if (args.length > 1) {
@@ -36,12 +39,28 @@ public class Main {
     private static void runFile(String filename) throws IOException {
         byte[] bytes = Files.readAllBytes(Paths.get(filename));
         run(new String(bytes, Charset.defaultCharset()));
-
+        if(hadError) {
+            System.exit(64);
+        }
     }
 
 
     private static void run(String source) {
+        Scanner scanner = new Scanner(source);
+        List<Token> tokens = scanner.scanTokens();
+        for (Token token : tokens) {
+            System.out.println(token);
+        }
 
+    }
+
+    static void error(int line, String message) {
+        report(line, "", message);
+    }
+
+    private static void report(int line, String where, String message) {
+        System.err.println("[line " + line + "] Error"  +  where + ": " + message);
+        var hadError = true;
     }
 
 
